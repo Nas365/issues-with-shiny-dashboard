@@ -1,4 +1,3 @@
-# issues-with-shiny-dashboard
 UI. FILE
 # Load libraries
 library(shiny)
