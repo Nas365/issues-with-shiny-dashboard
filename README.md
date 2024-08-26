@@ -3,7 +3,6 @@ UI. FILE
 library(shiny)
 library(tidyverse)
 
-# Application Layout
 shinyUI(
   fluidPage(
     br(),
@@ -28,9 +27,9 @@ shinyUI(
              wellPanel(
                p("Select a continuous variable and graph type (histogram or boxplot) to view on the right."),
                radioButtons(
-                 inputId = "continuous_variable",   # add radio buttons for continuous variables
+                 inputId = "continuous_variable",  
                  label = "Select Continuous Variable:",
-                 choices = c("Age" = "age", "Hours per Week" = "hours_per_week")    # add radio buttons for chart type
+                 choices = c("Age" = "age", "Hours per Week" = "hours_per_week")    
                )
              )
       ),  # Closing the first column correctly
@@ -68,10 +67,9 @@ shinyUI(
   )
 )
 
-
-
-SERVER.R
 # Load libraries
+install.packages("ggthemes")
+library(ggthemes)
 library(shiny)
 library(tidyverse)
 library(dplyr)
@@ -80,10 +78,8 @@ library(stringr)
 # Read in data
 adult <- read_csv("adult.csv")
 
-# Convert column names to lowercase for convenience 
 names(adult) <- tolower(names(adult))
 
-# Define server logic
 shinyServer(function(input, output) {
   
   df_country <- reactive({
@@ -93,19 +89,19 @@ shinyServer(function(input, output) {
   # TASK 5: Create logic to plot histogram or boxplot
   output$p1 <- renderPlot({
     if (input$graph_type == "histogram") {
-      # Histogram
+    
       ggplot(df_country(), aes_string(x = input$continuous_variable)) +
-        geom_histogram() +  # histogram geom
-        labs(y = "Number of People",  # labels
+        geom_histogram() +  
+        labs(y = "Number of People",  
              title = paste("Trend of", input$continuous_variable)) + 
         facet_wrap(~prediction) +
         theme_economist() +
         scale_color_economist()
     } else {
-      # Boxplot
+      
       ggplot(df_country(), aes_string(y = input$continuous_variable, x = "prediction")) +
-        geom_boxplot() +  # Boxplot geom
-        coord_flip() +  # Flip coordinates
+        geom_boxplot() + 
+        coord_flip() +  
         labs(title = paste("How", input$continuous_variable, "value is spread")) +  
         facet_wrap(~prediction) +
         theme_economist() +
@@ -115,10 +111,10 @@ shinyServer(function(input, output) {
   
   # TASK 6: Create logic to plot faceted bar chart or stacked bar chart
   output$p2 <- renderPlot({
-    # Bar chart
+   
     p <- ggplot(df_country(), aes_string(x = input$categorical_variable)) +
       labs(y = "Number of People",
-           title = paste("Trend of", input$continuous_variable)) +  # Labels
+           title = paste("Trend of", input$continuous_variable)) +  
       theme(axis.text.x = element_text(angle = 45), legend.position = "bottom")
     
     if (input$is_stacked) {
@@ -129,9 +125,7 @@ shinyServer(function(input, output) {
       p + 
         geom_bar(aes(fill = !!input$categorical_variable), position = "dodge") + 
         facet_wrap(~prediction) +
-        
-# TASK 7
-theme_economist() +
+        theme_economist() +
         scale_color_economist()
     }
   })
